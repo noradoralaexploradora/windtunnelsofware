@@ -586,6 +586,22 @@ def get_stats_for_plotting(pc_values,wtref_values, num_datasets):
             rmse_row[i+1] = rmse
             stats_rows.append(tuple(rmse_row))
 
+    # Bandbreite (Range)
+    ranges = [np.ptp(pc) for pc in pc_values]  # ptp = peak-to-peak
+    stats_rows.append(('Range (Max - Min)', *ranges))
+
+    # 95% Confidence Interval Width
+    ci_widths = [1.96 * (np.std(pc) / np.sqrt(len(pc))) for pc in pc_values]
+    stats_rows.append(('95% CI Width', *ci_widths))
+    
+    # Median and IQR
+    medians = [np.median(pc) for pc in pc_values]
+    stats_rows.append(('Median', *medians))
+
+    iqr_values = [sc.iqr(pc) for pc in pc_values]
+    stats_rows.append(('IQR (Q3 - Q1)', *iqr_values))
+
+
     return stats_rows
     
 
@@ -661,7 +677,7 @@ def compare_point_concentrations_3(PointConcTsArray, functionsForOverview=None, 
     # Determine which plots to show based on functionsForOverview
     all_plot_types = [
         "Histogram", "Pdf", "Cdf", "Means", "BoxPlot", 
-        "PowerDensity", "QuantilPlot", "ScatterPlot", "ResidualPlot", "Autocorrelation",
+        "PowerDensity", "QuantilPlot", "ScatterPlot", "ResidualPlot", "Autocorrelation", "StatisticalSummary"
     ]
     
     # Process functionsForOverview to determine which plots to show
@@ -908,7 +924,48 @@ def compare_point_concentrations_3(PointConcTsArray, functionsForOverview=None, 
             ax.legend()
     plot_functions["PowerDensity"] = create_powerDensityPlot
 
-    
+    def create_statistical_summary_plot(ax):
+        ax.axis('off')  # Keine Achsen anzeigen
+        stats_text = "Statistical Summary\n\n"
+
+        # Header
+        label_header = "Metric".ljust(20)
+        for label in labels:
+            label_header += f"{label[:15].ljust(18)}"
+        stats_text += label_header + "\n"
+
+        # Werte vorbereiten
+        metrics = [
+            ("Mean", [np.mean(pc) for pc in pc_values]),
+            ("Median", [np.median(pc) for pc in pc_values]),
+            ("Std Dev", [np.std(pc) for pc in pc_values]),
+            ("Skewness", [sc.skew(pc) for pc in pc_values]),
+            ("Perc. 95", [np.percentile(pc, 95) for pc in pc_values]),
+            ("Range", [np.ptp(pc) for pc in pc_values]),
+        ]
+
+        # CI Width optional
+        from scipy.stats import sem, t
+        ci_widths = []
+        confidence = 0.95
+        for pc in pc_values:
+            n = len(pc)
+            se = sem(pc)
+            h = se * t.ppf((1 + confidence) / 2, n - 1)
+            ci_widths.append(2 * h)
+        metrics.append(("CI Width (95%)", ci_widths))
+
+        # Text aufbauen
+        for name, values in metrics:
+            row = name.ljust(20)
+            for val in values:
+                row += f"{val:.4e}".ljust(18)
+            stats_text += row + "\n"
+
+        # In Plot schreiben
+        ax.text(0, 1, stats_text, ha='left', va='top', family='monospace', fontsize=11)
+    plot_functions["StatisticalSummary"] = create_statistical_summary_plot
+
     
     # Create plots based on the plots_to_show list
     plot_idx = 0
@@ -922,7 +979,7 @@ def compare_point_concentrations_3(PointConcTsArray, functionsForOverview=None, 
             else:
                 # Hide unused subplots
                 axs[row, col].axis('off')
-    
+
     plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adjust for the suptitle
     plt.show()
     
@@ -931,17 +988,15 @@ def compare_point_concentrations_3(PointConcTsArray, functionsForOverview=None, 
     for stat_row in stats_rows:
         stat_name = stat_row[0]
         values = stat_row[1:]
-        
+
         stats_line = f"{stat_name}: "
         for i, val in enumerate(values):
-            if val == '-':
+            try:
+                stats_line += f"{labels[i]} = {float(val):.4f}, "
+            except:
                 stats_line += f"{labels[i]} = N/A, "
-            else:
-                stats_line += f"{labels[i]} = {val:.4f}, "
-        
-        # Remove trailing comma and space
-        stats_line = stats_line[:-2]
-        print(stats_line)
+
+        print(stats_line.rstrip(', '))
         
     return
 
