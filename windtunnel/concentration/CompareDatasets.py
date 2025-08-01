@@ -944,16 +944,7 @@ def compare_point_concentrations_3(PointConcTsArray, functionsForOverview=None, 
             ("Range", [np.ptp(pc) for pc in pc_values]),
         ]
 
-        # CI Width optional
-        from scipy.stats import sem, t
-        ci_widths = []
-        confidence = 0.95
-        for pc in pc_values:
-            n = len(pc)
-            se = sem(pc)
-            h = se * t.ppf((1 + confidence) / 2, n - 1)
-            ci_widths.append(2 * h)
-        metrics.append(("CI Width (95%)", ci_widths))
+
 
         # Text aufbauen
         for name, values in metrics:
