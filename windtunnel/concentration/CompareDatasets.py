@@ -944,7 +944,7 @@ def compare_point_concentrations_3(PointConcTsArray, functionsForOverview=None, 
             ("Range", [np.ptp(pc) for pc in pc_values]),
         ]
 
-
+        
 
         # Text aufbauen
         for name, values in metrics:
@@ -993,7 +993,7 @@ def compare_point_concentrations_3(PointConcTsArray, functionsForOverview=None, 
 
 
  # Histogram plot function
-def create_histogram(PointConcTsArray,dimensionless="False",labels=None,xLabel=None,yLabel=None,xAchse=None,yAchse=None):
+def create_histogram(PointConcTsArray,dimensionless="True",labels=None,xLabel=None,yLabel=None,xAchse=None,yAchse=None):
     num_datasets = len(PointConcTsArray)
     pc_values,wtref_values,labels,max_val,min_val = get_arrays_for_plotting(PointConcTsArray,labels=labels, dimensionless=dimensionless)
 
@@ -1081,7 +1081,7 @@ def create_means(PointConcTsArray,error_values=None,errorType=None,dimensionless
    
     
 # Box plot function
-def create_boxplot(PointConcTsArray,dimensionless="False",labels=None,xLabel=None,yLabel=None,xAchse=None,yAchse=None):
+def create_boxplot(PointConcTsArray,dimensionless="True",labels=None,xLabel=None,yLabel=None,xAchse=None,yAchse=None):
     num_datasets = len(PointConcTsArray)
     pc_values,wtref_values,labels,max_val,min_val = get_arrays_for_plotting(PointConcTsArray,labels=labels, dimensionless=dimensionless)
     
