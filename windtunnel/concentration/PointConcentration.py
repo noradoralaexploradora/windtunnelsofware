@@ -180,7 +180,7 @@ class PointConcentration(pd.DataFrame):
            #Calculate for for use relevant entdimensionalised variables
            self.calc_non_dimensional_time()
            self.calc_c_star()	
-           self.calc_non_dimensional_flow_rate()		   
+           #self.calc_non_dimensional_flow_rate()		   
 
            self.time = self.non_dimensional_time
            self.net_concentration = self.c_star
