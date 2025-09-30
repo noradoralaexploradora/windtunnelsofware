@@ -774,8 +774,8 @@ def compare_point_concentrations_3(PointConcTsArray, functionsForOverview=None, 
         ax.set_title('Box Plot Comparison')
         ax.set_ylabel('Concentration')
         ax.grid(True)
-        if num_datasets > 3:
-            plt.setp(ax.get_xticklabels(), rotation=45)
+        if num_datasets > 4:
+            plt.xticks(rotation=45)
     plot_functions["BoxPlot"] = create_boxplot
     
     # Q-Q plot function
@@ -1091,7 +1091,8 @@ def create_boxplot(PointConcTsArray,dimensionless="True",labels=None,xLabel=None
     plt.xlabel(xLabel if xLabel is not None else 'Datasets')
     plt.ylabel(yLabel if yLabel is not None else 'Concentration')
     plt.grid(True)
-    if num_datasets > 3:
+    if num_datasets > 4:
+        ax = plt.gca()
         plt.setp(plt.get_xticklabels(), rotation=45)
     return
 
